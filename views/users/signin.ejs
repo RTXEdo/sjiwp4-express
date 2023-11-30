@@ -1,3 +1,35 @@
 <%-include("../header") %>
-    <h1>Prijava korisnika</h1>
-    <%-include("../footer") %>
+    <h1 class="m-4 text-5xl text-center">Prijava korisnika</h1>
+    <%if (result===false){%>
+        <div class="p-4">
+            <div role="alert" class="alert alert-error">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Pogrešna email adresa i/ili lozinka.</span>
+            </div>
+        </div>
+        <%}%>
+
+            <form class="p-8" method="post" action="/users/signin">
+                <label class="form-control w-full ">
+                    <div class="label">
+                        <span class="label-text">E-mail adresa</span>
+                    </div>
+                    <input name="email" type="email" placeholder="Unesite vašu E-mail adresu"
+                        class="input input-bordered w-full " required="" maxlength="50" />
+                </label>
+                <label class="form-control w-full ">
+                    <div class="label">
+                        <span class="label-text">Lozinka</span>
+                    </div>
+                    <input name="password" type="password" placeholder="Unesite vašu zaporku"
+                        class="input input-bordered w-full " required="" maxlength="50" />
+                </label>
+                <div class="flex flex-nowrap gap-2 w-full my-4">
+                    <input type="submit" value="Pošalji" class="flex-1 btn w-full" />
+                    <input type="reset" value="Poništi" class="flex-1 btn w-full" />
+                </div>
+                <%-include("../footer") %>
