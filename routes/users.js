@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 const Joi = require("joi");
 
+const { db } = require("../services/db.js");
+
 router.get('/signin', function (req, res, next) {
   res.render('users/signin', { result: null });
 });
@@ -20,13 +22,14 @@ router.post('/signin', function (req, res, next) {
   const email = req.body.email;
   const password = req.body.password;
 
-  let signinResult = false;
-  if (email === "test@test.com" && password === "123") {
-    signinResult = true;
-    res.render('users/signin_ok', { result: signinResult });
-  } else {
-    res.render("users/signin", { result: signinResult });
-  }
+  const stmt = db.prepare("SELECT * FROM users WHERE email = ? AND password = ?");
+  const dbResult = stmt.get(email, password);
+  console.log("DB kaže", dbResult);
+
+  res.render("users/signin");
+
 });
 
 module.exports = router;
+
+
