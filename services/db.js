@@ -1,4 +1,5 @@
-const Database=require("better-sqlite3");
-const db = new Database("baza.sqlite3", { verbose: console.log});
+const Database = require("better-sqlite3");
 
-module.exports={ db };
+const db = new Database("db.sqlite3", { verbose: console.log });
+
+module.exports = { db };
