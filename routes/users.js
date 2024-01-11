@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const Joi = require("joi");
 const { db } = require("../services/db.js");
-const {getUserJwt}=require("../services/auth.js")
-const bcrypt = require("bcrypt")
+const { getUserJwt } = require("../services/auth.js");
+const bcrypt = require("bcrypt");
 
 // GET /users/signin
 router.get("/signin", function (req, res, next) {
@@ -28,19 +28,24 @@ router.post("/signin", function (req, res, next) {
   const email = req.body.email;
   const password = req.body.password;
 
-  const stmt = db.prepare("SELECT * FROM users WHERE email = ? AND password = ?");
-  const dbResult = stmt.get(email, password);
-  console.log("DB Result", dbResult);
-  if (dbResult){
+  const stmt = db.prepare("SELECT * FROM users WHERE email = ?");
+  const dbResult = stmt.get(email);
+
+  if (dbResult) {
+    const passwordHash = dbResult.password;
+    const compareResult = bcrypt.compareSync(password, passwordHash);
+
+    if (!compareResult) {
+      res.render("users/signin", { result: { invalid_credentials: true } });
+    }
+
     const token = getUserJwt(dbResult.id, dbResult.email, dbResult.name, dbResult.role);
-    console.log("NEW TOKEN", token);
     res.cookie("auth", token);
-    
+
     res.render("users/signin", { result: { success: true } });
-  } else{
+  } else {
     res.render("users/signin", { result: { invalid_credentials: true } });
   }
-  
 });
 
 // SCHEMA signin
@@ -65,11 +70,26 @@ router.post("/signup", function (req, res, next) {
     return;
   }
 
+
+  const stmt1 = db.prepare("SELECT * FROM users WHERE email = ?;");
+  const selectResult = stmt1.get(req.body.email);
+  if(selectResult){
+    res.render("users/signup", { result: { email_in_use: true, display_form: true } });
+    return;
+  }
+
   const passwordHash = bcrypt.hashSync(req.body.password, 10);
 
-  console.log("DATA", req.body);
+  const stmt2 = db.prepare("INSERT INTO users (email, password, name, signed_at, role) VALUES (?, ?, ?, ?, ?);");
+  const insertResult = stmt2.run(req.body.email, passwordHash, req.body.name, Date.now(), "user");
 
-  
+  if (insertResult.changes && insertResult.changes === 1) {
+    res.render("users/signup", { result: { success: true } });
+  } else {
+    res.render("users/signup", { result: { database_error: true } });
+  }
+  return;
 });
+
 
 module.exports = router;

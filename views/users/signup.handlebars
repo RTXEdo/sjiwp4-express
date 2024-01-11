@@ -11,7 +11,7 @@
                             <div class="label">
                                 <span class="label-text">Ime i prezime</span>
                             </div>
-                            <input type="name" name="name" placeholder="Upišite svoje ime i prezime"
+                            <input type="text" name="name" placeholder="Upišite svoje ime i prezime"
                                 class="input input-bordered w-full max-w-xs" required="" />
                         </label>
                     </div>
@@ -62,7 +62,32 @@
             </div>
             {{/if}}
 
-           
+            {{#if result.database_error}}
+            <div class="mt-4">
+                <div class="card w-96 bg-error text-black">
+                    <div class="card-body">
+                        <h2 class="card-title">Greška!</h2>
+                        <p>
+                            Dogodila se greška prilikom spremanja podataka, kontaktirajte administratora!
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+
+
+{{#if result.email_in_use}}
+            <div class="mt-4">
+                <div class="card w-96 bg-error text-black">
+                    <div class="card-body">
+                        <h2 class="card-title">Greška!</h2>
+                        <p>
+                            E-mail adresa koju ste upisali je već u upotrebi!
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
 
             {{#if result.success}}
             <div class="mt-4">

@@ -8,6 +8,7 @@ const { engine } = require("express-handlebars");
 // ROUTERS IMPORT
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
+const competitionsRouter = require('./routes/competitions')
 
 // APP INIT
 const app = express();
@@ -27,6 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ROUTERS SETUP
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/competitions', competitionsRouter);
 
 // 404 > ERROR HANDLER
 app.use(function (req, res, next) {
