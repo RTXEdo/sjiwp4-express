@@ -6,6 +6,17 @@ const { getUserJwt } = require("../services/auth.js");
 const bcrypt = require("bcrypt");
 
 // GET /users/signin
+router.get("/data", function (req, res, next) {
+  res.render("users/data");
+});
+
+// GET /users/signout
+router.get("/signout", function (req, res, next) {
+  res.clearCookie(process.env.AUTH_COOKIE_KEY);
+  res.redirect("/");
+});
+
+// GET /users/signin
 router.get("/signin", function (req, res, next) {
   res.render("users/signin", { result: { display_form: true } });
 });
@@ -37,10 +48,11 @@ router.post("/signin", function (req, res, next) {
 
     if (!compareResult) {
       res.render("users/signin", { result: { invalid_credentials: true } });
+      return;
     }
 
     const token = getUserJwt(dbResult.id, dbResult.email, dbResult.name, dbResult.role);
-    res.cookie("auth", token);
+    res.cookie(process.env.AUTH_COOKIE_KEY, token);
 
     res.render("users/signin", { result: { success: true } });
   } else {
