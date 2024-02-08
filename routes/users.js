@@ -18,6 +18,7 @@ const schema_data = Joi.object({
 
 // POST /users/data
 router.post("/data", authRequired, function (req, res, next) {
+  // do validation
   const result = schema_data.validate(req.body);
   if (result.error) {
     res.render("users/data", { result: { validation_error: true, display_form: true } });
@@ -57,6 +58,7 @@ router.post("/data", authRequired, function (req, res, next) {
 
   if (!emailChanged && !nameChanged && !passwordChanged) {
     res.render("users/data", { result: { display_form: true } });
+    return;
   }
 
   let query = "UPDATE users SET";
@@ -75,9 +77,6 @@ router.post("/data", authRequired, function (req, res, next) {
   } else {
     res.render("users/data", { result: { database_error: true } });
   }
-
-  console.log(updateResult);
-  return;
 });
 
 // GET /users/signout
@@ -152,16 +151,14 @@ router.post("/signup", function (req, res, next) {
     return;
   }
 
-  //using the function checj
   if (!checkEmailUnique(req.body.email)) {
     res.render("users/signup", { result: { email_in_use: true, display_form: true } });
     return;
   }
 
   const passwordHash = bcrypt.hashSync(req.body.password, 10);
-
   const stmt2 = db.prepare("INSERT INTO users (email, password, name, signed_at, role) VALUES (?, ?, ?, ?, ?);");
-  const insertResult = stmt2.run(req.body.email, passwordHash, req.body.name, Date.now(), "user");
+  const insertResult = stmt2.run(req.body.email, passwordHash, req.body.name, new Date().toISOString(), "user");
 
   if (insertResult.changes && insertResult.changes === 1) {
     res.render("users/signup", { result: { success: true } });
@@ -170,6 +167,5 @@ router.post("/signup", function (req, res, next) {
   }
   return;
 });
-
 
 module.exports = router;
