@@ -4,15 +4,21 @@ const { authRequired, adminRequired } = require("../services/auth.js");
 const Joi = require("joi");
 const { db } = require("../services/db.js");
 
+// GET /application
+router.get("/application", authRequired, function (req, res, next) {
+    console.log("Stranica još nije aktivna. Za pomoć kontaktirajte administratora.");
+});
+
 // GET /competitions
 router.get("/", authRequired, function (req, res, next) {
     const stmt = db.prepare(`
-    SELECT c.id, c.name, c.description, u.name AS author, c.apply_till
-    FROM competitions c, users u
-    WHERE c.author_id = u.id
-    ORDER BY c.apply_till
+        SELECT c.id, c.name, c.description, u.name AS author, c.apply_till
+        FROM competitions c, users u
+        WHERE c.author_id = u.id
+        ORDER BY c.apply_till
     `);
     const result = stmt.all();
+
     res.render("competitions/index", { result: { items: result } });
 });
 
@@ -28,6 +34,7 @@ router.get("/delete/:id", adminRequired, function (req, res, next) {
     if (result.error) {
         throw new Error("Neispravan poziv");
     }
+
     const stmt = db.prepare("DELETE FROM competitions WHERE id = ?;");
     const deleteResult = stmt.run(req.params.id);
 
@@ -37,6 +44,7 @@ router.get("/delete/:id", adminRequired, function (req, res, next) {
 
     res.redirect("/competitions");
 });
+
 // GET /competitions/edit/:id
 router.get("/edit/:id", adminRequired, function (req, res, next) {
     // do validation
@@ -44,8 +52,10 @@ router.get("/edit/:id", adminRequired, function (req, res, next) {
     if (result.error) {
         throw new Error("Neispravan poziv");
     }
+
     const stmt = db.prepare("SELECT * FROM competitions WHERE id = ?;");
     const selectResult = stmt.get(req.params.id);
+
     if (!selectResult) {
         throw new Error("Neispravan poziv");
     }
@@ -53,8 +63,34 @@ router.get("/edit/:id", adminRequired, function (req, res, next) {
     res.render("competitions/form", { result: { display_form: true, edit: selectResult } });
 });
 
+// SCHEMA edit
+const schema_edit = Joi.object({
+    id: Joi.number().integer().positive().required(),
+    name: Joi.string().min(3).max(50).required(),
+    description: Joi.string().min(3).max(1000).required(),
+    apply_till: Joi.date().iso().required()
+});
 
-// GET /competitions/form
+// GET /competitions/edit
+router.post("/edit", adminRequired, function (req, res, next) {
+    // do validation
+    const result = schema_edit.validate(req.body);
+    if (result.error) {
+        res.render("competitions/form", { result: { validation_error: true, display_form: true } });
+        return;
+    }
+
+    const stmt = db.prepare("UPDATE competitions SET name = ?, description = ?, apply_till = ? WHERE id = ?;");
+    const updateResult = stmt.run(req.body.name, req.body.description, req.body.apply_till, req.body.id);
+
+    if (updateResult.changes && updateResult.changes === 1) {
+        res.redirect("/competitions");
+    } else {
+        res.render("competitions/form", { result: { database_error: true } });
+    }
+});
+
+// GET /competitions/add
 router.get("/add", adminRequired, function (req, res, next) {
     res.render("competitions/form", { result: { display_form: true } });
 });
@@ -66,7 +102,7 @@ const schema_add = Joi.object({
     apply_till: Joi.date().iso().required()
 });
 
-// POST /competitions/form
+// POST /competitions/add
 router.post("/add", adminRequired, function (req, res, next) {
     // do validation
     const result = schema_add.validate(req.body);

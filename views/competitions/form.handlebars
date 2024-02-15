@@ -1,6 +1,7 @@
 <div class="p-2">
     {{#if result.display_form}}
-    <form method="post" action="/competitions/{{#if result.edit}}edit{{/if}}{{#unless result.edit}}add{{/unless}}" class="flex flex-col gap-2">
+    <form method="post" action="/competitions/{{#if result.edit}}edit{{/if}}{{#unless result.edit}}add{{/unless}}"
+        class="flex flex-col gap-2">
         <div class="pb-2 flex flex-col">
             <label>Naziv</label>
             <input type="text" name="name" class="bg-neutral" required="" minlength="3" maxlength="50" {{#if
@@ -8,10 +9,8 @@
         </div>
         <div class="pb-2 flex flex-col" x-data="{}">
             <label>Opis</label>
-            <textarea name="description" class="bg-neutral" rows="10" required="" minlength="3"
-            {{#if result.edit}}x-text="'{{result.edit.description}}'"{{/if}}
-            >
-                {{#if result.edit}}{{result.edit.apply_till}}{{/if}}
+            <textarea name="description" class="bg-neutral" rows="10" required="" minlength="3" {{#if
+                result.edit}}x-text="'{{result.edit.description}}'" {{/if}}>
             </textarea>
         </div>
         <div class="pb-2 flex flex-col">
