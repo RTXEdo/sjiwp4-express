@@ -5,9 +5,28 @@ const Joi = require("joi");
 const { db } = require("../services/db.js");
 
 // GET /application
-router.get("/application", authRequired, function (req, res, next) {
-    console.log("Stranica još nije aktivna. Za pomoć kontaktirajte administratora.");
+router.get("/application/:id", authRequired, function (req, res, next) {
+    // do validation
+    const result1 = schema_id.validate(req.params);
+    if (result1.error) {
+        throw new Error("Neispravan poziv");
+    }
+
+    const stmt = db.prepare(`
+    SELECT id_application, id_user, id_competition, points
+    FROM application
+    WHERE id_user = ? AND id_competition = ?
+    `
+    );
+    const result = stmt.get(req.user.sub, req.params.id);
+    res.render("competitions/application", { result: { items: result } });
+
+    const stmt1 = db.prepare("INSERT INTO application id_user, id_competition");
+    const insertResult = stmt1.run(req.user.sub, req.params.competition);
+
 });
+
+
 
 // GET /competitions
 router.get("/", authRequired, function (req, res, next) {
