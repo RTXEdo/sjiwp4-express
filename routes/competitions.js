@@ -7,34 +7,34 @@ const { db } = require("../services/db.js");
 //GET /competitions/login/:id - ZADATAK 1
 router.get("/application/:id", function (req, res, next) {
 
-// do validation
-const result = schema_id.validate(req.params);
-if (result.error) {
-throw new Error("Neispravan poziv");
-}
+    // do validation
+    const result = schema_id.validate(req.params);
+    if (result.error) {
+        throw new Error("Neispravan poziv");
+    }
 
-// PROVJERA JE LI KORISNIK UPISAN
+    // PROVJERA JE LI KORISNIK UPISAN
 
-const checkStmt1 = db.prepare("SELECT count(*) FROM login WHERE id_user = ? AND id_competition = ?;");
-const checkResult1 = checkStmt1.get(req.user.sub, req.params.id);
-console.log(checkResult1);
+    const checkStmt1 = db.prepare("SELECT count(*) FROM login WHERE id_user = ? AND id_competition = ?;");
+    const checkResult1 = checkStmt1.get(req.user.sub, req.params.id);
+    console.log(checkResult1);
 
-if (checkResult1["count(*)"] >= 1) {
-res.render("competitions/form", { result: { database_error: true } });
-}
-else {
+    if (checkResult1["count(*)"] >= 1) {
+        res.render("competitions/form", { result: { database_error: true } });
+    }
+    else {
 
-// UPIS U BAZU
+        // UPIS U BAZU
 
-const stmt = db.prepare("INSERT INTO login (id_user, id_competition) VALUES (?, ?);");
-const updateResult = stmt.run(req.user.sub, req.params.id);
+        const stmt = db.prepare("INSERT INTO login (id_user, id_competition) VALUES (?, ?);");
+        const updateResult = stmt.run(req.user.sub, req.params.id);
 
-if (updateResult.changes && updateResult.changes === 1) {
-res.render("competitions/application", { result: { items: result } });
- } else {
-res.render("competitions/form", { result: { database_error: true } });
-}
-}
+        if (updateResult.changes && updateResult.changes === 1) {
+            res.render("competitions/application", { result: { items: result } });
+        } else {
+            res.render("competitions/form", { result: { database_error: true } });
+        }
+    }
 });
 
 // GET /competitions
@@ -63,8 +63,17 @@ router.get("/delete/:id", adminRequired, function (req, res, next) {
         throw new Error("Neispravan poziv");
     }
 
-    const stmt = db.prepare("DELETE FROM competitions WHERE id = ?;");
-    const deleteResult = stmt.run(req.params.id);
+    //ZADATAK 3
+    const stmtchk = db.prepare("SELECT count(*) FROM login WHERE id_competition = ?;");
+    const chkrslt = stmtchk.get(req.params.id);
+
+    if (chkrslt["count(*)"] >= 1) {
+        const stmt1 = db.prepare("DELETE FROM login WHERE id_competition = ?;");
+        const delRes1 = stmt1.run(req.params.id);
+    }
+
+    const stmt2 = db.prepare("DELETE FROM competitions WHERE id = ?;");
+    const deleteResult = stmt2.run(req.params.id);
 
     if (!deleteResult.changes || deleteResult.changes !== 1) {
         throw new Error("Operacija nije uspjela");
@@ -151,15 +160,15 @@ router.post("/add", adminRequired, function (req, res, next) {
 
 //ZADATAK 2
 //GET/competitions/score_input
-router.get("/score_input/:id", adminRequired, function (req, res, next){
+router.get("/score_input/:id", adminRequired, function (req, res, next) {
     const stmt = db.prepare(`
-        SELECT c.id, c.name, c.description, u.name AS CompetitorA, c.apply_till, l.id AS login_id, l.id_user, l.id_competition, l.score
+        SELECT c.id, c.name, c.description, u.name AS Competitor, c.apply_till, l.id AS login_id, l.id_user, l.id_competition, l.score
         FROM competitions c, users u, login l
         WHERE c.author_id = u.id AND l.id=?
         ORDER BY c.apply_till
     `);
     const result = stmt.all(req.params.id);
-    res.render("competitions/score_input", {result:{items:result}});
+    res.render("competitions/score_input", { result: { items: result } });
 });
 
 
@@ -183,10 +192,24 @@ router.post("/score_change", adminRequired, function (req, res, next) {
     const updateResult = stmt.run(req.body.score, req.body.id);
 
     if (updateResult.changes && updateResult.changes === 1) {
-        res.redirect("/competitions/score_input");
+        res.redirect("/competitions/score_input/" + req.body.id);
     } else {
-        //res.render("competitions/form", { result: { database_error: true } });
+        res.render("competitions/form", { result: { database_error: true } });
     }
 });
 
+//ZADATAK 3.2
+router.get("/report/:id", authRequired, function (req, res, next) {
+    const stmt = db.prepare(`
+        SELECT c.id, c.name, c.description, u.name AS Competitor, c.apply_till, l.id AS login_id, l.id_user, l.id_competition, l.score 
+        FROM competitions c, users u, login l
+        WHERE c.author_id = u.id AND l.id=?
+        ORDER BY c.apply_till`);
+
+    const resultReport = stmt.all(req.params.id);
+console.log(resultReport);
+
+    res.render("competitions/report", { result: { items: resultReport } });
+
+});
 module.exports = router;

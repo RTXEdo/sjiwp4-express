@@ -2,7 +2,7 @@
     {{#if user.is_admin }}
     <a href="/competitions/add" class="btn btn-primary">Novo natjecanje</a>
     {{/if}}
-
+    
     <div class="overflow-x-auto">
         <table class="table">
             <!-- head -->
@@ -39,6 +39,8 @@
                         
                         {{/if}} 
                         <a href="/competitions/application/{{this.id}}" class="btn btn-accent btn-xs">Prijava</a>
+
+                        <a href="/competitions/report/{{this.id}}" class="btn btn-accent btn-xs">Ispiši izvješće</a>
                     </td>
                 </tr>
                 {{/each}}
