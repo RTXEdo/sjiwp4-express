@@ -5,6 +5,14 @@
     <title>Moja Express aplikacija</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script src="//unpkg.com/alpinejs" defer></script>
+    <style>
+        /* Hide the navigation bar when printing */
+        @media print {
+            .flex.flex-wrap.gap-2.bg-base-200.p-2 {
+                display: none !important;
+            }
+        }
+    </style>
 </head>
 
 <body>

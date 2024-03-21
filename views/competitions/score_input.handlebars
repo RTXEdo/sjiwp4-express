@@ -18,13 +18,14 @@
                     <td>{{this.Competitor}}</td>
                     <td>{{this.name}}</td>
                     <td>
-                        <form method="post" action="/competitions/score_change" class="flex flex-col gap-2">
+                        <form method="post" action="/competitions/score_change/{{this.id}}" class="flex flex-col gap-2">
                             <div class="flex flex-col">
                                 <label>Score</label>
                                 <input id="score" type="number" name="score" value="{{this.score}}" />
                                 <input type="hidden" name="id" value="{{this.login_id}}" />
                                 {{>form_buttons}}
                             </div>
+                        </form>
                     </td>
                 </tr>
                 {{/each}}

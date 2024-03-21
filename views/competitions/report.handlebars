@@ -1,26 +1,23 @@
 <div class="p-2">
-    <div class="overflow-x-auto">
-        <table class="table">
+    <div class="hero min-screen bg-base-200 p-5">
+    <h1 class="text-5xl font-bold">Ljestvica bodova za natjecanje: 
+        {{result.name}}</h1>
+    </div>
+<div class="hero min-screen bg-base-200 p-5">
+    <h2 class="text-3x1 font-bold"  x-data="{}"> Datum prijave: <span x-text="new Date('{{result.date}}').toLocaleString()"></span> </h2>
+    </div>
+
+    <div class="flex flex-none flex-col items-center">
+        <table>
             <!-- head -->
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Ime natjecatelja</th>
-                    <th>Natjecanje</th>
-                    <th>Vrijeme prijave</th>
-                    <th>Broj bodova</th>
-                </tr>
-            </thead>
             <!-- body -->
             <tbody>
                 {{#each result.items}}
                 <tr>
-                    <th>{{this.login_id}}</th>
-                    <td>{{this.Competitor}}</td>
-                    <td>{{this.name}}</td> 
+                    <th class="p-2" x-data="{}"><span x-text="{{@index}}+1"></span></th>
+                    <td class="p-3">{{this.Competitor}}</td>
                     </td>
                     <td x-data="{}">
-                        <span x-text="new Date('{{this.apply_till}}').toLocaleString()"></span>
                     </td>
                     <td>{{this.score}}</td> 
                 </tr>
@@ -29,3 +26,4 @@
         </table>
     </div>
 </div>
+

@@ -164,7 +164,7 @@ router.get("/score_input/:id", adminRequired, function (req, res, next) {
     const stmt = db.prepare(`
         SELECT c.id, c.name, c.description, u.name AS Competitor, c.apply_till, l.id AS login_id, l.id_user, l.id_competition, l.score
         FROM competitions c, users u, login l
-        WHERE c.author_id = u.id AND l.id=?
+        WHERE l.id_user = u.id AND l.id_competition=c.id AND c.id=?
         ORDER BY c.apply_till
     `);
     const result = stmt.all(req.params.id);
@@ -179,7 +179,7 @@ const schema_ScoreEdit = Joi.object({
 });
 
 //POST/competitions/score_change
-router.post("/score_change", adminRequired, function (req, res, next) {
+router.post("/score_change/:id", adminRequired, function (req, res, next) {
     // do validation
     const result = schema_ScoreEdit.validate(req.body);
 
@@ -192,7 +192,7 @@ router.post("/score_change", adminRequired, function (req, res, next) {
     const updateResult = stmt.run(req.body.score, req.body.id);
 
     if (updateResult.changes && updateResult.changes === 1) {
-        res.redirect("/competitions/score_input/" + req.body.id);
+        res.redirect("/competitions/score_input/" + req.params.id);
     } else {
         res.render("competitions/form", { result: { database_error: true } });
     }
@@ -203,13 +203,13 @@ router.get("/report/:id", authRequired, function (req, res, next) {
     const stmt = db.prepare(`
         SELECT c.id, c.name, c.description, u.name AS Competitor, c.apply_till, l.id AS login_id, l.id_user, l.id_competition, l.score 
         FROM competitions c, users u, login l
-        WHERE c.author_id = u.id AND l.id=?
-        ORDER BY c.apply_till`);
+        WHERE l.id_user = u.id AND l.id_competition=?
+        ORDER BY l.score desc`);
 
     const resultReport = stmt.all(req.params.id);
-console.log(resultReport);
+    console.log(resultReport);
 
-    res.render("competitions/report", { result: { items: resultReport } });
+    res.render("competitions/report", { result: { items: resultReport, name: resultReport[0].name, date: resultReport[0].apply_till } });
 
 });
 module.exports = router;
