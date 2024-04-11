@@ -1,0 +1,16 @@
+<div class="p-2">
+    <article class="prose">
+        <p>
+            Ovdje možete ostaviti poruku i povratnu informaciju o natjecanju. Hvala!
+        </p>
+    </article>
+</div>
+
+<div class="p-3">
+    <form method="post" action="/competitions/forum">
+        <input type="text" name="feedback" placeholder="Type here" class="input input-bordered w-full max-w-l" />
+        <input type="hidden" name="id_competition" value="{{this.id}}" />
+        {{>form_buttons}}
+    </form>
+
+</div>

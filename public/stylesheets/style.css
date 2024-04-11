@@ -1795,6 +1795,17 @@ html {
   outline-color: var(--fallback-bc,oklch(var(--bc)/0.2));
 }
 
+.textarea-primary {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-p,oklch(var(--p)/var(--tw-border-opacity)));
+}
+
+.textarea-primary:focus {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-p,oklch(var(--p)/var(--tw-border-opacity)));
+  outline-color: var(--fallback-p,oklch(var(--p)/1));
+}
+
 .textarea-disabled,
   .textarea:disabled,
   .textarea[disabled] {
@@ -1828,6 +1839,44 @@ html {
     transform: scale(1);
     opacity: 1;
   }
+}
+
+:root .prose {
+  --tw-prose-body: var(--fallback-bc,oklch(var(--bc)/0.8));
+  --tw-prose-headings: var(--fallback-bc,oklch(var(--bc)/1));
+  --tw-prose-lead: var(--fallback-bc,oklch(var(--bc)/1));
+  --tw-prose-links: var(--fallback-bc,oklch(var(--bc)/1));
+  --tw-prose-bold: var(--fallback-bc,oklch(var(--bc)/1));
+  --tw-prose-counters: var(--fallback-bc,oklch(var(--bc)/1));
+  --tw-prose-bullets: var(--fallback-bc,oklch(var(--bc)/0.5));
+  --tw-prose-hr: var(--fallback-bc,oklch(var(--bc)/0.2));
+  --tw-prose-quotes: var(--fallback-bc,oklch(var(--bc)/1));
+  --tw-prose-quote-borders: var(--fallback-bc,oklch(var(--bc)/0.2));
+  --tw-prose-captions: var(--fallback-bc,oklch(var(--bc)/0.5));
+  --tw-prose-code: var(--fallback-bc,oklch(var(--bc)/1));
+  --tw-prose-pre-code: var(--fallback-nc,oklch(var(--nc)/1));
+  --tw-prose-pre-bg: var(--fallback-n,oklch(var(--n)/1));
+  --tw-prose-th-borders: var(--fallback-bc,oklch(var(--bc)/0.5));
+  --tw-prose-td-borders: var(--fallback-bc,oklch(var(--bc)/0.2));
+}
+
+.prose :where(code):not(:where([class~="not-prose"] *)) {
+  padding: 2px 8px;
+  border-radius: var(--rounded-badge);
+}
+
+.prose code:after,
+  .prose code:before {
+  content: none;
+}
+
+.prose pre code {
+  border-radius: 0;
+  padding: 0;
+}
+
+.prose :where(tbody tr, thead):not(:where([class~="not-prose"] *)) {
+  border-bottom-color: var(--fallback-bc,oklch(var(--bc)/0.2));
 }
 
 .btn-xs {
@@ -1890,6 +1939,10 @@ html {
 
 .card-normal .card-title {
   margin-bottom: 0.75rem;
+}
+
+.right-full {
+  right: 100%;
 }
 
 .mt-4 {
@@ -1975,6 +2028,10 @@ html {
   justify-content: flex-end;
 }
 
+.justify-center {
+  justify-content: center;
+}
+
 .gap-2 {
   gap: 0.5rem;
 }
@@ -2003,11 +2060,6 @@ html {
   background-color: var(--fallback-p,oklch(var(--p)/var(--tw-bg-opacity)));
 }
 
-.bg-blue-200 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(191 219 254 / var(--tw-bg-opacity));
-}
-
 .stroke-current {
   stroke: currentColor;
 }
@@ -2016,12 +2068,12 @@ html {
   padding: 0.5rem;
 }
 
-.p-5 {
-  padding: 1.25rem;
-}
-
 .p-3 {
   padding: 0.75rem;
+}
+
+.p-5 {
+  padding: 1.25rem;
 }
 
 .py-3 {
@@ -2044,6 +2096,10 @@ html {
 
 .text-center {
   text-align: center;
+}
+
+.align-middle {
+  vertical-align: middle;
 }
 
 .text-5xl {

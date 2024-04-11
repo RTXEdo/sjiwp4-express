@@ -211,5 +211,40 @@ router.get("/report/:id", authRequired, function (req, res, next) {
 
     res.render("competitions/report", { result: { items: resultReport, name: resultReport[0].name, date: resultReport[0].apply_till } });
 
+
+
+
+
+});
+//4. KORAK
+
+const schema_forumFeedback = Joi.object({
+    id_competition: Joi.number().required(),
+    feedback: Joi.string().min(3).max(1000).required()
+});
+
+
+
+router.get("/forum/:id", authRequired, function (req, res, next) {
+    const stmt = db.prepare(`
+        SELECT id_forum, id_competition, id_user, feedback, competitions.id, competitions.name, users.id, users.name
+        FROM forum, competitions, users
+        WHERE id_user=users.id AND forum.id_competition=?
+        ORDER BY id_forum
+    `);
+    const result = stmt.all(req.params.id);
+    console.log(result);
+    res.render("competitions/forum", { result: { items: result } });
+});
+
+router.post("/forum", authRequired, function (req, res, next) {
+    const result = schema_forumFeedback.validate(req.body);
+
+    try {
+        const stmt = db.prepare("INSERT INTO forum (id_user, id_competition, feedback) VALUES (?, ?, ?);");
+        const insertResult = stmt.run(req.user.sub, req.body.id_competition, req.body.feedback);
+    } catch (error) {
+        console.log(error);
+    }
 });
 module.exports = router;
