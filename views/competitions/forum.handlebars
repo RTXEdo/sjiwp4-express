@@ -9,7 +9,7 @@
 <div class="p-3">
     <form method="post" action="/competitions/forum">
         <input type="text" name="feedback" placeholder="Type here" class="input input-bordered w-full max-w-l" />
-        <input type="hidden" name="id_competition" value="{{this.id}}" />
+        <input type="hidden" name="id_competition" value="{{result.competition}}" />
         {{>form_buttons}}
     </form>
 

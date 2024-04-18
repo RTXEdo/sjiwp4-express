@@ -218,6 +218,7 @@ router.get("/report/:id", authRequired, function (req, res, next) {
 });
 //4. KORAK
 
+//4.1 - Zapisivanje poruka u bazu podataka
 const schema_forumFeedback = Joi.object({
     id_competition: Joi.number().required(),
     feedback: Joi.string().min(3).max(1000).required()
@@ -226,25 +227,38 @@ const schema_forumFeedback = Joi.object({
 
 
 router.get("/forum/:id", authRequired, function (req, res, next) {
-    const stmt = db.prepare(`
-        SELECT id_forum, id_competition, id_user, feedback, competitions.id, competitions.name, users.id, users.name
-        FROM forum, competitions, users
-        WHERE id_user=users.id AND forum.id_competition=?
-        ORDER BY id_forum
-    `);
-    const result = stmt.all(req.params.id);
-    console.log(result);
-    res.render("competitions/forum", { result: { items: result } });
+
+    // do validation
+    const result = schema_id.validate(req.params);
+    if (result.error) {
+        throw new Error("Neispravan poziv");
+    }
+
+    res.render("competitions/forum", { result: { competition: req.params.id } });
 });
 
 router.post("/forum", authRequired, function (req, res, next) {
     const result = schema_forumFeedback.validate(req.body);
+    const stmt = db.prepare("INSERT INTO forum (id_user, id_competition, feedback) VALUES (?, ?, ?);");
+    const insertResult = stmt.run(req.user.sub, req.body.id_competition, req.body.feedback);
 
-    try {
-        const stmt = db.prepare("INSERT INTO forum (id_user, id_competition, feedback) VALUES (?, ?, ?);");
-        const insertResult = stmt.run(req.user.sub, req.body.id_competition, req.body.feedback);
-    } catch (error) {
-        console.log(error);
-    }
+    console.log(insertResult);
+    res.render("competitions/forum_ok", { result: { id: req.body.id_competition }});
 });
+
+//4.2 Ispisivanje poruka na formu
+router.get("/forum_output/:id", authRequired, function (req, res, next) {
+    const result = schema_id.validate(req.params);
+    if (result.error) {
+        throw new Error("Neispravan poziv");
+    }
+    const stmt = db.prepare(`
+    SELECT f.feedback, u.id, u.name
+    FROM forum f, competitions c, users u
+    WHERE f.id_user = u.id AND c.id = f.id_competition AND c.id = ?
+    `)
+    const outputResult = stmt.all(req.params.id);
+    res.render("competitions/forum_output", { result: { items: outputResult } });
+});
+
 module.exports = router;
